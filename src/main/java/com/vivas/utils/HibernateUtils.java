@@ -34,4 +34,7 @@ public class HibernateUtils {
             session.close();
         }
     }
+    public static void rollback(Transaction tx){
+        tx.rollback();
+    }
 }

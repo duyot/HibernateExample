@@ -9,6 +9,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.criterion.Criterion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +27,37 @@ public class AdminUserJPA {
 
     public AdminUserJPA(){
         sessionFactory = HibernateUtils.getSessionFactory();
+    }
+
+    public AdminUser findById(long id){
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = sessionFactory.getCurrentSession();
+//            session.unwrap(Session.class).setDefaultReadOnly(true);
+            transaction = session.getTransaction();
+            transaction.begin();
+
+            AdminUser admin =  session.get(AdminUser.class,id);
+            admin.setUsername("newusername");
+            //get second admin
+            log.info("Before get 1");
+            AdminUser admin1 =  session.get(AdminUser.class,2896377L);
+            log.info("After get 1");
+            admin1.setUsername("newusernameadmin11");
+            admin.setUsername("newusernameadmin00");
+            //
+            transaction.commit();
+            log.info("SUCCESS");
+            return admin;
+        } catch (HibernateException e) {
+            log.error("Error caused: "+ e.toString());
+            e.printStackTrace();
+            transaction.rollback();
+        }finally {
+            HibernateUtils.closeConnection(session);
+        }
+        return new AdminUser();
     }
 
     public List<AdminUser> getAll(){
@@ -50,23 +82,26 @@ public class AdminUserJPA {
             session = sessionFactory.getCurrentSession();
             tx = session.getTransaction();
             tx.begin();
+
             session.save(adminUser);
+//            session.persist(adminUser);
+            long id = adminUser.getId();
+            log.info("Saved id: "+ id);
             tx.commit();
             log.info("Save successfully");
         } catch (HibernateException e) {
             log.error("Save error cased: "+ e.toString());
             e.printStackTrace();
             tx.rollback();
-
+        }finally {
+            HibernateUtils.closeConnection(session);
         }
-        HibernateUtils.closeConnection(session);
-        System.exit(0);
     }
 
     public static void main(String[] args) {
         AdminUserJPA adminUserJPA = new AdminUserJPA();
-//        adminUserJPA.save(new AdminUser("test1","test"));
-        System.out.println(adminUserJPA.getAll().size());
+//        adminUserJPA.save(new AdminUser("test_persist","test"));
+        System.out.println(adminUserJPA.findById(2896376L).getUsername());
         System.exit(0);
     }
 
