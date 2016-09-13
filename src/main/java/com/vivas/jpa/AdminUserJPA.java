@@ -7,15 +7,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import org.hibernate.criterion.Criterion;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.Persistence;
-import javax.transaction.UserTransaction;
 import java.util.List;
 
 /**
@@ -82,7 +76,6 @@ public class AdminUserJPA {
             session = sessionFactory.getCurrentSession();
             tx = session.getTransaction();
             tx.begin();
-
             session.save(adminUser);
 //            session.persist(adminUser);
             long id = adminUser.getId();
